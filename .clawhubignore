@@ -1,0 +1,23 @@
+# clawhub publish ignore rules
+# paths listed here will NOT be shipped to clawhub
+
+# ---- publish tooling (this is why the publish script is invisible to users) ----
+scripts/
+
+# ---- VCS / editor / OS noise ----
+.git/
+.github/
+.gitattributes
+.gitignore
+.clawhubignore
+.DS_Store
+.vscode/
+.idea/
+
+# ---- build / deps (defensive, not used today) ----
+node_modules/
+dist/
+build/
+*.log
+*.tmp
+*.bak
