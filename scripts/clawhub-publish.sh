@@ -30,7 +30,7 @@
 #   1. Validate semver (x.y.z[-prerelease][+build]).
 #   2. Ensure target dir is a clean git worktree (skippable via --no-git-check).
 #   3. Ensure new version > current VERSION file content (skipped on --republish).
-#   4. Bump VERSION, sync SKILL.md header, prepend CHANGELOG.md (skipped on --republish).
+#   4. Bump VERSION, prepend CHANGELOG.md (skipped on --republish).
 #   5. Call `clawhub publish --slug=<slug> --version=<ver>` with .clawhubignore
 #      honoured, so this script and other non-skill files are NOT shipped.
 # -----------------------------------------------------------------------------
@@ -160,21 +160,7 @@ bump_files() {
   # 1) VERSION
   printf '%s\n' "$NEW_VERSION" > "$VERSION_FILE"
 
-  # 2) SKILL.md header ("version:" metadata line, insert or replace)
-  local skill="$PROJECT_DIR/SKILL.md"
-  if [[ -f "$skill" ]]; then
-    if grep -qE '^<!-- version: .* -->$' "$skill"; then
-      # portable in-place replace (macOS + GNU)
-      sed -i.bak -E "s|^<!-- version: .* -->$|<!-- version: ${NEW_VERSION} (${TS}) -->|" "$skill"
-      rm -f "${skill}.bak"
-    else
-      local tmp="${skill}.tmp"
-      { printf '<!-- version: %s (%s) -->\n' "$NEW_VERSION" "$TS"; cat "$skill"; } > "$tmp"
-      mv "$tmp" "$skill"
-    fi
-  fi
-
-  # 3) CHANGELOG.md (prepend new entry; keep existing content)
+  # 2) CHANGELOG.md (prepend new entry; keep existing content)
   local changelog="$PROJECT_DIR/CHANGELOG.md"
   local header="# Changelog"
   local entry
@@ -195,10 +181,10 @@ bump_files() {
 if [[ $DRY_RUN -eq 1 ]]; then
   log "[dry-run] skipped file writes"
 elif [[ $REPUBLISH -eq 1 ]]; then
-  log "[republish] skipped local file bump (VERSION/SKILL.md/CHANGELOG.md untouched)"
+  log "[republish] skipped local file bump (VERSION/CHANGELOG.md untouched)"
 else
   bump_files
-  log "bumped VERSION, SKILL.md header, CHANGELOG.md"
+  log "bumped VERSION, CHANGELOG.md"
 fi
 
 # ---------- invoke clawhub ----------
